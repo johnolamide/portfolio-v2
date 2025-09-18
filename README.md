@@ -8,7 +8,7 @@
 
 🔖 **Project Title & Description**
 
-**Personal Portfolio Website v2** is a modern, interactive web application designed to showcase a developer's projects, skills, and professional experience. This portfolio website serves as a digital resume and project gallery, targeted at developers, designers, and tech professionals looking to present their work to potential employers, clients, and collaborators. Key features include dynamic project displays fetched from GitHub, smooth animations, and an interactive AI chatbot accessible via a hovering button, enabling visitors to ask questions about the developer's background, projects, and expertise in real-time. In an increasingly digital job market, a well-crafted portfolio website is essential for standing out, demonstrating technical abilities, and building a personal brand. This project matters because it provides a platform for continuous learning display, project documentation, and professional networking, ultimately facilitating career opportunities and collaborations.
+**Personal Portfolio Website v2** is a dynamic web application that allows any GitHub user to generate a personalized portfolio dashboard by entering their GitHub username. Upon input, the app fetches the user's profile data, repositories, and activity via the GitHub API, then renders a custom dashboard with project showcases, skills visualization, and an AI-powered chatbot. The chatbot is context-aware, drawing from the user's GitHub data (e.g., bio, repos, languages, contributions) to answer questions about their background, projects, and expertise in real-time. This makes the portfolio a versatile tool for developers to quickly create shareable, data-driven profiles without manual setup, while the AI enhances interactivity by providing personalized insights. This shift emphasizes accessibility and scalability: anyone with a GitHub account can instantly generate a professional-looking portfolio, fostering community sharing and networking. It matters in a competitive tech landscape by democratizing portfolio creation and enabling AI-assisted self-presentation.
 
 🛠️ **Tech Stack**
 
@@ -18,7 +18,9 @@
 - **UI Framework**: React with TypeScript for component-based architecture
 - **Styling**: Tailwind CSS for utility-first, responsive styling
 - **Animation**: Framer Motion for smooth, performant animations and transitions
-- **API Integration**: GitHub API for dynamically fetching and displaying project repositories
+- **API Integration**: GitHub API for dynamically fetching and displaying project repositories; Axios for HTTP requests
+- **Data Visualization**: Recharts for interactive charts (e.g., skills breakdown)
+- **AI Chatbot**: Google Gemini API for natural language processing and context-aware responses
 - **Deployment**: (To be determined - potentially Vercel, Netlify, or GitHub Pages)
 
 🧠 **AI Integration Strategy**
@@ -37,5 +39,7 @@ Throughout the development process, AI tools will be leveraged to accelerate cod
 - Code diffs and error messages for targeted debugging assistance
 - User stories and design requirements for feature implementation
 - Existing codebase patterns to maintain consistency across the project
+
+**Runtime AI Features**: The application itself incorporates AI through the interactive chatbot, which uses Google's Gemini API to provide context-aware responses based on the user's GitHub data. The chatbot can be prompted with questions about the portfolio owner's background, projects, and skills, enhancing user engagement and providing personalized insights.
 
 This AI-driven approach will enable rapid prototyping, maintain high code quality, and ensure thorough documentation, allowing focus on creative aspects of portfolio design and user experience.
