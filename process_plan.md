@@ -32,7 +32,7 @@ This document outlines the step-by-step process to build the dynamic portfolio w
 - [x] Add additional dependencies: `bun add axios recharts framer-motion tailwindcss @ai-sdk/google ai`
 - [x] Configure Tailwind CSS: `bun add -D tailwindcss postcss autoprefixer && bun tailwindcss init -p`
 - [x] Set up environment variables for GitHub token and Gemini API key
-- [ ] Initialize Git repository and create initial commit
+- [x] Initialize Git repository and create initial commit
 
 ## 2. Project Structure Setup
 - [ ] Create folder structure:
@@ -141,8 +141,8 @@ This document outlines the step-by-step process to build the dynamic portfolio w
 
 ## Progress Tracking
 - Total Steps: 12 major phases
-- Completed: 0
-- In Progress: Project Initialization
+- Completed: 1
+- In Progress: Project Structure Setup
 - Next Priority: Project Structure Setup
 
 *Note: This plan is flexible and can be adjusted based on project needs. Use GitHub Issues or a project board to track individual tasks within each phase.*
