@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { githubService } from '../utils/github';
 import { processUserData } from '../utils/dataProcessing';
 import type {
@@ -53,25 +53,30 @@ export const useGitHubRepos = (username: string | null, options = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<GitHubApiError | null>(null);
   const [hasMore, setHasMore] = useState(false);
+  const currentPageRef = useRef(0);
 
   const fetchRepos = useCallback(async (loadMore = false) => {
     if (!username) {
       setRepos([]);
       setError(null);
       setHasMore(false);
+      currentPageRef.current = 0;
       return;
     }
 
     setLoading(true);
     if (!loadMore) {
       setError(null);
+      currentPageRef.current = 0;
     }
 
     try {
-      const currentPage = loadMore ? Math.ceil(repos.length / 30) + 1 : 1;
+      const page = loadMore ? currentPageRef.current + 1 : 1;
+      currentPageRef.current = page;
+
       const repoData = await githubService.getUserRepos(username, {
         ...options,
-        page: currentPage,
+        page,
         per_page: 30
       });
 
@@ -91,7 +96,7 @@ export const useGitHubRepos = (username: string | null, options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [username, repos.length, options]);
+  }, [username]); // Only depend on username
 
   useEffect(() => {
     fetchRepos();

@@ -10,8 +10,7 @@ import type {
 const githubApi = axios.create({
   baseURL: 'https://api.github.com',
   headers: {
-    'Accept': 'application/vnd.github.v3+json',
-    'User-Agent': 'Portfolio-Generator/1.0.0'
+    'Accept': 'application/vnd.github.v3+json'
   },
   timeout: 10000 // 10 second timeout
 });

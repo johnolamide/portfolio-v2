@@ -1,5 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { MapPin, Building, Globe, Github, Star, Users, Code } from 'lucide-react';
 import type { GitHubUser } from '../types';
 
 interface UserProfileProps {
@@ -12,120 +13,309 @@ interface UserProfileProps {
   };
 }
 
+// Animated counter hook
+const useAnimatedCounter = (end: number, duration: number = 2000) => {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    const controls = animate(count, end, { duration });
+    return controls.stop;
+  }, [count, end, duration]);
+
+  return rounded;
+};
+
 const UserProfile: React.FC<UserProfileProps> = ({ user, stats }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Animated counters
+  const animatedRepos = useAnimatedCounter(stats?.totalRepos || 0);
+  const animatedFollowers = useAnimatedCounter(user.followers || 0);
+  const animatedStars = useAnimatedCounter(stats?.totalStars || 0);
+  const animatedLanguages = useAnimatedCounter(stats?.languagesCount || 0);
+
+  const statItems = [
+    {
+      label: 'Repositories',
+      value: animatedRepos,
+      staticValue: stats?.totalRepos || 0,
+      icon: Github,
+      color: 'from-blue-500 to-cyan-500',
+      bgColor: 'bg-blue-500/10'
+    },
+    {
+      label: 'Followers',
+      value: animatedFollowers,
+      staticValue: user.followers || 0,
+      icon: Users,
+      color: 'from-green-500 to-emerald-500',
+      bgColor: 'bg-green-500/10'
+    },
+    {
+      label: 'Stars',
+      value: animatedStars,
+      staticValue: stats?.totalStars || 0,
+      icon: Star,
+      color: 'from-yellow-500 to-orange-500',
+      bgColor: 'bg-yellow-500/10'
+    },
+    {
+      label: 'Languages',
+      value: animatedLanguages,
+      staticValue: stats?.languagesCount || 0,
+      icon: Code,
+      color: 'from-purple-500 to-pink-500',
+      bgColor: 'bg-purple-500/10'
+    }
+  ];
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-2xl border border-white/20 mb-8"
+      transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="relative mb-8"
     >
-      <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
+      {/* Background gradient */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-2xl blur-2xl"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.3, duration: 1 }}
+      />
+
+      <motion.div
+        className="relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20 overflow-hidden"
+        whileHover={{ y: -2 }}
+        transition={{ duration: 0.2 }}
+      >
+        {/* Animated background pattern */}
         <motion.div
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <img
-            src={user.avatar_url}
-            alt={`${user.login}'s avatar`}
-            className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white/20 shadow-lg"
-          />
-        </motion.div>
+          className="absolute inset-0 opacity-5"
+          animate={{
+            backgroundPosition: ['0% 0%', '100% 100%'],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            repeatType: 'reverse',
+          }}
+          style={{
+            backgroundImage: 'radial-gradient(circle at 25% 25%, #ffffff 1px, transparent 1px)',
+            backgroundSize: '15px 15px',
+          }}
+        />
 
-        <div className="flex-1 text-center md:text-left">
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-3xl md:text-4xl font-bold text-white mb-2"
-          >
-            {user.name || user.login}
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl text-purple-300 mb-4"
-          >
-            @{user.login}
-          </motion.p>
-
-          {user.bio && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-gray-300 mb-4 leading-relaxed"
+        <div className="relative z-10">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-8 lg:space-y-0 lg:space-x-8">
+            {/* Avatar Section */}
+            <motion.div
+              className="flex-shrink-0"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{
+                delay: 0.2,
+                duration: 0.8,
+                type: "spring",
+                stiffness: 200,
+                damping: 20
+              }}
             >
-              {user.bio}
-            </motion.p>
+              <div className="relative">
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-lg"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.5, 0.8, 0.5],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+                <motion.img
+                  src={user.avatar_url}
+                  alt={`${user.login}'s avatar`}
+                  className="relative w-32 h-32 lg:w-40 lg:h-40 rounded-full border-4 border-white/30 shadow-2xl object-cover"
+                  onLoad={() => setImageLoaded(true)}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: imageLoaded ? 1 : 0 }}
+                  transition={{ duration: 0.5 }}
+                  whileHover={{ scale: 1.05 }}
+                />
+                {!imageLoaded && (
+                  <motion.div
+                    className="absolute inset-0 bg-white/10 rounded-full animate-pulse"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                )}
+              </div>
+            </motion.div>
+
+            {/* Info Section */}
+            <div className="flex-1 text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <motion.h1
+                  className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent mb-2"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {user.name || user.login}
+                </motion.h1>
+
+                <motion.div
+                  className="flex items-center justify-center lg:justify-start text-xl text-purple-300 mb-4"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Github className="w-5 h-5 mr-2" />
+                  @{user.login}
+                </motion.div>
+              </motion.div>
+
+              {user.bio && (
+                <motion.p
+                  className="text-gray-300 text-lg leading-relaxed mb-6 max-w-2xl"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  {user.bio}
+                </motion.p>
+              )}
+
+              {/* Contact Info */}
+              <motion.div
+                className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                {user.location && (
+                  <motion.div
+                    className="flex items-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <MapPin className="w-4 h-4 mr-2 text-purple-400" />
+                    {user.location}
+                  </motion.div>
+                )}
+
+                {user.company && (
+                  <motion.div
+                    className="flex items-center text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <Building className="w-4 h-4 mr-2 text-blue-400" />
+                    {user.company}
+                  </motion.div>
+                )}
+
+                {user.blog && (
+                  <motion.a
+                    href={user.blog}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center text-gray-300 hover:text-purple-300 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <Globe className="w-4 h-4 mr-2 text-cyan-400" />
+                    Website
+                  </motion.a>
+                )}
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Stats Grid */}
+          {stats && (
+            <motion.div
+              className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-8 pt-8 border-t border-white/20"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              {statItems.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={item.label}
+                    className={`relative ${item.bgColor} rounded-xl p-4 text-center overflow-hidden`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9 + index * 0.1 }}
+                    whileHover={{
+                      scale: 1.05,
+                      boxShadow: `0 10px 30px rgba(0,0,0,0.3)`
+                    }}
+                  >
+                    {/* Animated background */}
+                    <motion.div
+                      className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0`}
+                      whileHover={{ opacity: 0.1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+
+                    <div className="relative z-10">
+                      <motion.div
+                        className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 mb-3"
+                        whileHover={{ rotate: 360 }}
+                        transition={{ duration: 0.6 }}
+                      >
+                        <Icon className="w-6 h-6 text-white" />
+                      </motion.div>
+
+                      <motion.div
+                        className="text-3xl font-bold text-white mb-1"
+                        key={item.staticValue} // Re-trigger animation when value changes
+                      >
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 1 + index * 0.1, duration: 0.5 }}
+                        >
+                          {item.value}
+                        </motion.span>
+                      </motion.div>
+
+                      <div className="text-sm text-gray-400 font-medium">
+                        {item.label}
+                      </div>
+
+                      {/* Progress bar animation */}
+                      <motion.div
+                        className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.2 + index * 0.1 }}
+                      >
+                        <motion.div
+                          className={`h-full bg-gradient-to-r ${item.color} rounded-full`}
+                          initial={{ width: 0 }}
+                          animate={{ width: '100%' }}
+                          transition={{
+                            delay: 1.4 + index * 0.1,
+                            duration: 1.5,
+                            ease: "easeOut"
+                          }}
+                        />
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           )}
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-400"
-          >
-            {user.location && (
-              <div className="flex items-center">
-                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
-                {user.location}
-              </div>
-            )}
-
-            {user.company && (
-              <div className="flex items-center">
-                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10v2a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2H8a2 2 0 01-2-2v-2zm6 0a1 1 0 00-1-1H9a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1z" clipRule="evenodd" />
-                </svg>
-                {user.company}
-              </div>
-            )}
-
-            {user.blog && (
-              <div className="flex items-center">
-                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0113.971 9h1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clipRule="evenodd" />
-                </svg>
-                <a href={user.blog} target="_blank" rel="noopener noreferrer" className="hover:text-purple-300 transition-colors">
-                  Website
-                </a>
-              </div>
-            )}
-          </motion.div>
         </div>
-      </div>
-
-      {stats && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/20"
-        >
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">{stats.totalRepos}</div>
-            <div className="text-sm text-gray-400">Repositories</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">{user.followers}</div>
-            <div className="text-sm text-gray-400">Followers</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">{stats.totalStars}</div>
-            <div className="text-sm text-gray-400">Stars</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">{stats.languagesCount}</div>
-            <div className="text-sm text-gray-400">Languages</div>
-          </div>
-        </motion.div>
-      )}
+      </motion.div>
     </motion.div>
   );
 };

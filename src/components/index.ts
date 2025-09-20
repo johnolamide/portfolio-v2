@@ -5,3 +5,5 @@ export { default as UserProfile } from './UserProfile';
 export { default as ProjectCard } from './ProjectCard';
 export { default as SkillsChart } from './SkillsChart';
 export { default as ActivityTimeline } from './ActivityTimeline';
+export { Dashboard } from './Dashboard';
+export { Chatbot } from './Chatbot';
