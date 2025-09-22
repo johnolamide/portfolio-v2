@@ -7,7 +7,7 @@ import { ActivityTimeline } from './ActivityTimeline';
 import { StatisticsOverview } from './StatisticsOverview';
 import { ChatBot } from './ChatBot';
 import { Card, CardContent } from './ui/card';
-import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Loader2, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { Button } from './ui/button';
 import { portfolioAnalysisService } from '../services/portfolioAnalysis';
 
@@ -16,13 +16,15 @@ interface DashboardProps {
   loading: boolean;
   error: string | null;
   onRetry: () => void;
+  onBackToLanding: () => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
   data,
   loading,
   error,
-  onRetry
+  onRetry,
+  onBackToLanding
 }) => {
   if (loading) {
     return (
@@ -94,6 +96,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+      {/* Back Button */}
+      <div className="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="container mx-auto px-4 py-4 max-w-7xl">
+          <Button
+            onClick={onBackToLanding}
+            variant="outline"
+            className="flex items-center space-x-2 hover:bg-purple-50 dark:hover:bg-purple-900/20 border-purple-200 dark:border-purple-700"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Landing</span>
+          </Button>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">

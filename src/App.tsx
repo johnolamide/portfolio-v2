@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeProvider, useTheme } from './components/theme-provider';
 import { ThemeToggle } from './components/theme-toggle';
 // import { TailwindTest } from './components/tailwind-test';
@@ -147,14 +147,33 @@ function LandingPage({ onSubmit }: { onSubmit: (username: string) => void }) {
 }
 
 function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>('landing');
-  const [username, setUsername] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>(() => {
+    // Restore view from localStorage on page load
+    return (localStorage.getItem('portfolio-current-view') as 'landing' | 'dashboard') || 'landing';
+  });
+  const [username, setUsername] = useState<string | null>(() => {
+    // Restore username from localStorage on page load
+    return localStorage.getItem('portfolio-username') || null;
+  });
 
   const { data, loading, error, refetch } = useGitHubUserData(username);
+
+  // Save view and username to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('portfolio-current-view', currentView);
+    if (username) {
+      localStorage.setItem('portfolio-username', username);
+    }
+  }, [currentView, username]);
 
   const handleUsernameSubmit = async (submittedUsername: string) => {
     setUsername(submittedUsername);
     setCurrentView('dashboard');
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentView('landing');
+    // Don't clear username from localStorage, just change view
   };
 
   const handleRetry = () => {
@@ -175,6 +194,7 @@ function App() {
           loading={loading}
           error={error?.message || null}
           onRetry={handleRetry}
+          onBackToLanding={handleBackToLanding}
         />
       )}
     </ThemeProvider>
