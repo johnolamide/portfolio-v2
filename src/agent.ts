@@ -23,4 +23,4 @@ export const portfolioAnalysisAgent = async (prompt: string) => {
 
 // Example usage: Analyze a GitHub portfolio
 // await portfolioAnalysisAgent("Analyze the GitHub portfolio for user 'johnolamide'. Provide a comprehensive assessment of their technical skills, project quality, and professional presentation. Include specific recommendations for portfolio improvement.");
-await portfolioAnalysisAgent("what are the top 3 languages used by johnolamide");
+await portfolioAnalysisAgent("what are the top 3 languages used by johnolamide and what is the total stars across all repos?");

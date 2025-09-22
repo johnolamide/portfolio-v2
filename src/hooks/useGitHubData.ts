@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { githubService } from '../utils/github';
 import { processUserData } from '../utils/dataProcessing';
 import type {
@@ -26,9 +26,12 @@ export const useGitHubUser = (username: string | null) => {
     setError(null);
 
     try {
+      console.log(`useGitHubUser: Fetching user ${username}`);
       const userData = await githubService.getUser(username);
+      console.log(`useGitHubUser: User data received for ${userData.login}`);
       setUser(userData);
     } catch (err) {
+      console.error(`useGitHubUser: Error fetching user ${username}:`, err);
       setError(err as GitHubApiError);
       setUser(null);
     } finally {
@@ -56,8 +59,11 @@ export const useGitHubRepos = (username: string | null, options = {}) => {
   const [hasMore, setHasMore] = useState(false);
   const currentPageRef = useRef(0);
 
+  const stableOptions = useMemo(() => options, [options]);
+
   const fetchRepos = useCallback(async (loadMore = false) => {
     if (!username) {
+      console.log('No username provided, clearing repos');
       setRepos([]);
       setError(null);
       setHasMore(false);
@@ -75,21 +81,31 @@ export const useGitHubRepos = (username: string | null, options = {}) => {
       const page = loadMore ? currentPageRef.current + 1 : 1;
       currentPageRef.current = page;
 
+      console.log(`useGitHubRepos: Fetching repos for ${username}, page ${page}`);
+      
       const repoData = await githubService.getUserRepos(username, {
-        ...options,
+        ...stableOptions,
         page,
-        per_page: 30
+        per_page: 100 // Increase to max
       });
 
+      console.log(`useGitHubRepos: Received ${repoData.length} repositories`);
+
       if (loadMore) {
-        setRepos(prev => [...prev, ...repoData]);
+        setRepos(prev => {
+          const newRepos = [...prev, ...repoData];
+          console.log(`Total repos after loading more: ${newRepos.length}`);
+          return newRepos;
+        });
       } else {
         setRepos(repoData);
+        console.log(`Set repos to ${repoData.length} repositories`);
       }
 
-      // Check if there are more pages (GitHub returns up to 100 repos per page)
-      setHasMore(repoData.length === 30);
+      // Check if there are more pages
+      setHasMore(repoData.length === 100);
     } catch (err) {
+      console.error('useGitHubRepos: Error fetching repositories:', err);
       setError(err as GitHubApiError);
       if (!loadMore) {
         setRepos([]);
@@ -97,11 +113,11 @@ export const useGitHubRepos = (username: string | null, options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [username, options]); // Include options in dependencies
+  }, [username]); // Remove stableOptions from dependencies
 
   useEffect(() => {
     fetchRepos();
-  }, [fetchRepos]);
+  }, [fetchRepos]); // Now fetchRepos only depends on username, so this is safe
 
   return {
     repos,
@@ -136,25 +152,23 @@ export const useGitHubUserData = (username: string | null) => {
 
   // Process data when both user and repos are loaded
   useEffect(() => {
-    if (user && repos.length > 0) {
+    console.log('useGitHubUserData: Processing data...', {
+      hasUser: !!user,
+      userLoading,
+      reposLoading,
+      reposCount: repos.length,
+      username: user?.login
+    });
+
+    if (user && !userLoading && !reposLoading) {
       try {
+        console.log('useGitHubUserData: Both user and repos loaded, processing...');
         const processed = processUserData(user, repos);
         setProcessedData(processed);
         setError(null);
-      } catch {
-        setError({
-          message: 'Failed to process user data',
-          status: undefined
-        });
-        setProcessedData(null);
-      }
-    } else if (user && repos.length === 0) {
-      // Handle case where user has no repositories
-      try {
-        const processed = processUserData(user, []);
-        setProcessedData(processed);
-        setError(null);
-      } catch {
+        console.log('useGitHubUserData: Data processed successfully');
+      } catch (err) {
+        console.error('useGitHubUserData: Error processing data:', err);
         setError({
           message: 'Failed to process user data',
           status: undefined
@@ -162,21 +176,29 @@ export const useGitHubUserData = (username: string | null) => {
         setProcessedData(null);
       }
     } else {
+      console.log('useGitHubUserData: Not ready to process data yet');
       setProcessedData(null);
     }
-  }, [user, repos]);
+  }, [user, repos, userLoading, reposLoading]);
 
   // Set loading state
   useEffect(() => {
-    setLoading(userLoading || reposLoading);
+    const isLoading = userLoading || reposLoading;
+    console.log('useGitHubUserData: Loading state:', { userLoading, reposLoading, isLoading });
+    setLoading(isLoading);
   }, [userLoading, reposLoading]);
 
   // Set error state (prioritize user errors)
   useEffect(() => {
-    setError(userError || reposError);
+    const currentError = userError || reposError;
+    if (currentError) {
+      console.log('useGitHubUserData: Error state:', currentError);
+    }
+    setError(currentError);
   }, [userError, reposError]);
 
   const refetch = useCallback(() => {
+    console.log('useGitHubUserData: Refetching data...');
     refetchUser();
     refetchRepos();
   }, [refetchUser, refetchRepos]);

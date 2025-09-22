@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { ThemeProvider, useTheme } from './components/theme-provider';
 import { ThemeToggle } from './components/theme-toggle';
 import { TailwindTest } from './components/tailwind-test';
+import { Dashboard } from './components/Dashboard';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
+import { useGitHubUserData } from './hooks/useGitHubData';
 import { Github, Sparkles, Code, Users, Star } from 'lucide-react';
 import './App.css';
 
@@ -146,18 +148,17 @@ function LandingPage({ onSubmit }: { onSubmit: (username: string) => void }) {
 
 function App() {
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>('landing');
-  const [userData, setUserData] = useState<{ username: string } | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
-  const handleUsernameSubmit = async (username: string) => {
-    // Simulate API call - in real implementation, this would fetch GitHub data
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setUserData({ username });
+  const { data, loading, error, refetch } = useGitHubUserData(username);
+
+  const handleUsernameSubmit = async (submittedUsername: string) => {
+    setUsername(submittedUsername);
     setCurrentView('dashboard');
   };
 
-  const handleBack = () => {
-    setUserData(null);
-    setCurrentView('landing');
+  const handleRetry = () => {
+    refetch();
   };
 
   return (
@@ -169,19 +170,12 @@ function App() {
       {currentView === 'landing' ? (
         <LandingPage onSubmit={handleUsernameSubmit} />
       ) : (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Dashboard Coming Soon
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Portfolio for {userData?.username} will be displayed here.
-            </p>
-            <Button onClick={handleBack} variant="outline">
-              ← Back to Home
-            </Button>
-          </div>
-        </div>
+        <Dashboard
+          data={data}
+          loading={loading}
+          error={error?.message || null}
+          onRetry={handleRetry}
+        />
       )}
     </ThemeProvider>
   );

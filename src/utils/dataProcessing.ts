@@ -56,8 +56,20 @@ export const processUserData = (
   user: GitHubUser,
   repos: GitHubRepository[]
 ): ProcessedUserData => {
+  console.log('Processing user data:', {
+    user: user.login,
+    repoCount: repos.length,
+    userPublicRepos: user.public_repos
+  });
+
   const stats = calculateUserStats(repos);
   const { languages } = processLanguages(repos);
+
+  console.log('Processed data result:', {
+    stats,
+    topLanguagesCount: stats.topLanguages.length,
+    repositoriesCount: repos.length
+  });
 
   return {
     user,

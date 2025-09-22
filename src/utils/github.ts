@@ -17,7 +17,7 @@ const githubApi = axios.create({
 });
 
 // Add GitHub token if available
-const githubToken = process.env.VITE_GITHUB_TOKEN;
+const githubToken = import.meta.env.VITE_GITHUB_TOKEN;
 if (githubToken) {
   githubApi.defaults.headers.common['Authorization'] = `token ${githubToken}`;
 }
@@ -69,9 +69,12 @@ export const githubService = {
   async getUser(username: string): Promise<GitHubUser> {
     try {
       await enforceRateLimit();
+      console.log(`Fetching user: ${username}`);
       const response: AxiosResponse<GitHubUser> = await githubApi.get(`/users/${username}`);
+      console.log('User data fetched successfully:', response.data.login, response.data.public_repos);
       return response.data;
     } catch (error) {
+      console.error('Error fetching user:', error);
       throw handleApiError(error);
     }
   },
@@ -88,18 +91,34 @@ export const githubService = {
       const params = {
         sort: options.sort || 'updated',
         direction: options.direction || 'desc',
-        per_page: Math.min(options.per_page || 30, 100), // Max 100 per page
+        per_page: Math.min(options.per_page || 100, 100), // Increase to max 100
         page: options.page || 1,
-        type: 'owner' // Only repos owned by the user
+        type: 'all' // Fetch all repos (owned and forked)
       };
 
-      const response: AxiosResponse<GitHubRepository[]> = await githubApi.get(
-        `/users/${username}/repos`,
-        { params }
-      );
+      console.log(`Fetching repos for ${username} with params:`, params);
+      const url = `/users/${username}/repos`;
+      console.log('Making request to:', url);
+
+      const response: AxiosResponse<GitHubRepository[]> = await githubApi.get(url, { params });
+      
+      console.log(`Repositories fetched: ${response.data.length} repos`);
+      console.log('First few repos:', response.data.slice(0, 3).map(r => ({ 
+        name: r.name, 
+        stars: r.stargazers_count, 
+        language: r.language 
+      })));
 
       return response.data;
     } catch (error) {
+      console.error('Error fetching repositories:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          response: (error as AxiosError).response?.data,
+          status: (error as AxiosError).response?.status
+        });
+      }
       throw handleApiError(error);
     }
   },
@@ -121,6 +140,7 @@ export const githubService = {
   async getRateLimit(): Promise<GitHubRateLimit | null> {
     try {
       const response = await githubApi.get('/rate_limit');
+      console.log('Rate limit status:', response.data);
       return response.data;
     } catch (error) {
       console.warn('Could not fetch rate limit status:', error);
