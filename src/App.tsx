@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ThemeProvider, useTheme } from './components/theme-provider';
 import { ThemeToggle } from './components/theme-toggle';
-import { TailwindTest } from './components/tailwind-test';
+// import { TailwindTest } from './components/tailwind-test';
 import { Dashboard } from './components/Dashboard';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -165,7 +165,7 @@ function App() {
     <ThemeProvider defaultTheme="light" storageKey="portfolio-theme">
       <ThemeToggle />
       <ThemeDebug />
-      <TailwindTest />
+      {/* <TailwindTest /> */}
 
       {currentView === 'landing' ? (
         <LandingPage onSubmit={handleUsernameSubmit} />
