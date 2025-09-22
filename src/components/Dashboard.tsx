@@ -56,10 +56,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {error}
             </p>
-            <Button onClick={onRetry} className="w-full">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Try Again
-            </Button>
+            <div className="space-y-3">
+              <Button onClick={onRetry} className="w-full">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Try Again
+              </Button>
+              <Button
+                onClick={onBackToLanding}
+                variant="outline"
+                className="w-full border-purple-200 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Landing
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -75,9 +85,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               No Data Available
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               Unable to load portfolio data. Please try again.
             </p>
+            <Button
+              onClick={onBackToLanding}
+              variant="outline"
+              className="w-full border-purple-200 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Landing
+            </Button>
           </CardContent>
         </Card>
       </div>
