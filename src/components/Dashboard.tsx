@@ -5,9 +5,11 @@ import { ProgrammingLanguagesChart } from './ProgrammingLanguagesChart';
 import { RepositoryGrid } from './RepositoryGrid';
 import { ActivityTimeline } from './ActivityTimeline';
 import { StatisticsOverview } from './StatisticsOverview';
+import { ChatBot } from './ChatBot';
 import { Card, CardContent } from './ui/card';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from './ui/button';
+import { portfolioAnalysisService } from '../services/portfolioAnalysis';
 
 interface DashboardProps {
   data: ProcessedUserData | null;
@@ -86,6 +88,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
   console.log('Total Repositories:', repositories);
   console.log('User Info:', user);
 
+  const handlePortfolioAnalysis = async (prompt: string): Promise<string> => {
+    return await portfolioAnalysisService.analyzePortfolio(prompt, user.login);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -147,6 +153,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </p>
         </div>
       </div>
+
+      {/* AI Chatbot - Floating */}
+      <ChatBot 
+        username={user.login}
+        onAnalyzePortfolio={handlePortfolioAnalysis}
+      />
     </div>
   );
 };
