@@ -5,7 +5,8 @@ import type {
   GitHubUser,
   GitHubRepository,
   ProcessedUserData,
-  GitHubApiError
+  GitHubApiError,
+  GitHubRateLimit
 } from '../types';
 
 // Hook for fetching user profile
@@ -96,7 +97,7 @@ export const useGitHubRepos = (username: string | null, options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [username]); // Only depend on username
+  }, [username, options]); // Include options in dependencies
 
   useEffect(() => {
     fetchRepos();
@@ -140,7 +141,7 @@ export const useGitHubUserData = (username: string | null) => {
         const processed = processUserData(user, repos);
         setProcessedData(processed);
         setError(null);
-      } catch (err) {
+      } catch {
         setError({
           message: 'Failed to process user data',
           status: undefined
@@ -153,7 +154,7 @@ export const useGitHubUserData = (username: string | null) => {
         const processed = processUserData(user, []);
         setProcessedData(processed);
         setError(null);
-      } catch (err) {
+      } catch {
         setError({
           message: 'Failed to process user data',
           status: undefined
@@ -191,7 +192,7 @@ export const useGitHubUserData = (username: string | null) => {
 
 // Hook for checking API rate limit status
 export const useGitHubRateLimit = () => {
-  const [rateLimit, setRateLimit] = useState<any>(null);
+  const [rateLimit, setRateLimit] = useState<GitHubRateLimit | null>(null);
   const [loading, setLoading] = useState(false);
 
   const checkRateLimit = useCallback(async () => {

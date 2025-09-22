@@ -1,9 +1,10 @@
-import axios, { type AxiosResponse } from 'axios';
+import axios, { type AxiosResponse, type AxiosError } from 'axios';
 import type {
   GitHubUser,
   GitHubRepository,
   GitHubLanguages,
-  GitHubApiError
+  GitHubApiError,
+  GitHubRateLimit
 } from '../types';
 
 // Create axios instance with base configuration
@@ -16,30 +17,32 @@ const githubApi = axios.create({
 });
 
 // Add GitHub token if available
-const githubToken = import.meta.env.VITE_GITHUB_TOKEN;
+const githubToken = process.env.VITE_GITHUB_TOKEN;
 if (githubToken) {
   githubApi.defaults.headers.common['Authorization'] = `token ${githubToken}`;
 }
 
 // Error handling utility
-const handleApiError = (error: any): GitHubApiError => {
-  if (error.response) {
+const handleApiError = (error: unknown): GitHubApiError => {
+  const axiosError = error as AxiosError;
+  if (axiosError.response) {
     // Server responded with error status
+    const data = axiosError.response.data as Record<string, unknown>;
     return {
-      message: error.response.data?.message || 'API request failed',
-      status: error.response.status,
-      documentation_url: error.response.data?.documentation_url
+      message: (data?.message as string) || 'API request failed',
+      status: axiosError.response.status,
+      documentation_url: data?.documentation_url as string
     };
-  } else if (error.request) {
-    // Network error
+  } else if (axiosError.request) {
+    // Request was made but no response received
     return {
-      message: 'Network error - please check your internet connection',
+      message: 'Network error - no response received',
       status: undefined
     };
   } else {
-    // Other error
+    // Something else happened
     return {
-      message: error.message || 'An unexpected error occurred',
+      message: axiosError.message || 'An unexpected error occurred',
       status: undefined
     };
   }
@@ -115,7 +118,7 @@ export const githubService = {
   },
 
   // Get rate limit status
-  async getRateLimit(): Promise<any> {
+  async getRateLimit(): Promise<GitHubRateLimit | null> {
     try {
       const response = await githubApi.get('/rate_limit');
       return response.data;

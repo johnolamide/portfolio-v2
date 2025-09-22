@@ -1,176 +1,190 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Layout, UsernameForm, Dashboard, LoadingSpinner, ErrorMessage, Chatbot } from './components';
-import { useGitHubData } from './hooks/useGitHubDataWrapper';
+import { useState } from 'react';
+import { ThemeProvider, useTheme } from './components/theme-provider';
+import { ThemeToggle } from './components/theme-toggle';
+import { TailwindTest } from './components/tailwind-test';
+import { Button } from './components/ui/button';
+import { Input } from './components/ui/input';
+import { Github, Sparkles, Code, Users, Star } from 'lucide-react';
+import './App.css';
 
-const App: React.FC = () => {
-  const { userData, loading, error, fetchUserData, resetData } = useGitHubData();
+function ThemeDebug() {
+  const { theme } = useTheme();
+  return (
+    <div className="fixed top-16 right-4 z-50 bg-black/80 text-white px-2 py-1 rounded text-xs font-mono">
+      Theme: {theme}
+    </div>
+  );
+}
 
-  const handleUsernameSubmit = async (username: string) => {
-    // Update URL for shareable portfolio
-    const url = new URL(window.location.href);
-    url.searchParams.set('user', username);
-    window.history.pushState({}, '', url.toString());
-    
-    await fetchUserData(username);
-  };
+function LandingPage({ onSubmit }: { onSubmit: (username: string) => void }) {
+  const [username, setUsername] = useState('johnolamide');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleReset = () => {
-    // Clear URL parameter when resetting
-    const url = new URL(window.location.href);
-    url.searchParams.delete('user');
-    window.history.pushState({}, '', url.toString());
-    
-    resetData();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username.trim()) {
+      setError('Please enter a GitHub username');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      await onSubmit(username.trim());
+    } catch {
+      setError('Failed to load portfolio. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <Layout>
-      <div className="relative min-h-screen overflow-hidden">
-        {/* Dynamic Background */}
-        <motion.div
-          className="fixed inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900"
-          animate={{
-            background: [
-              'linear-gradient(45deg, #1e1b4b, #581c87, #be185d)',
-              'linear-gradient(90deg, #312e81, #7c2d12, #be123c)',
-              'linear-gradient(135deg, #1e3a8a, #6b21a8, #c2410c)',
-              'linear-gradient(45deg, #1e1b4b, #581c87, #be185d)'
-            ]
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-
-        {/* Animated Background Elements */}
-        <motion.div
-          className="absolute inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2 }}
-        >
-          {/* Floating Orbs */}
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full bg-white/10 backdrop-blur-sm"
-              style={{
-                width: Math.random() * 200 + 100,
-                height: Math.random() * 200 + 100,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                x: [0, Math.random() * 100 - 50],
-                y: [0, Math.random() * 100 - 50],
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{
-                duration: Math.random() * 10 + 10,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: i * 2,
-              }}
-            />
-          ))}
-
-          {/* Grid Pattern */}
-          <motion.div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `radial-gradient(circle at 25px 25px, rgba(255,255,255,0.2) 2px, transparent 0)`,
-              backgroundSize: '50px 50px',
-            }}
-            animate={{
-              backgroundPosition: ['0px 0px', '50px 50px'],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        </motion.div>
-
-        {/* Content Container */}
-        <div className="relative z-10">
-          <AnimatePresence mode="wait">
-            {!userData && !loading && (
-              <motion.div
-                key="username-form"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="flex items-center justify-center min-h-screen px-4"
-              >
-                <motion.div
-                  initial={{ y: 50 }}
-                  animate={{ y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.6 }}
-                  className="w-full max-w-md"
-                >
-                  <UsernameForm onSubmit={handleUsernameSubmit} />
-                </motion.div>
-              </motion.div>
-            )}
-
-            {loading && (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="flex items-center justify-center min-h-screen"
-              >
-                <LoadingSpinner />
-              </motion.div>
-            )}
-
-            {error && (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
-                className="flex items-center justify-center min-h-screen px-4"
-              >
-                <ErrorMessage message={error.message} onRetry={handleReset} />
-              </motion.div>
-            )}
-
-            {userData && !loading && !error && (
-              <motion.div
-                key="dashboard"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              >
-                <Dashboard userData={userData} onReset={handleReset} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Chatbot with enhanced positioning */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1, duration: 0.5, type: "spring" }}
-          className="relative z-20"
-        >
-          <Chatbot userData={userData} isLoading={loading} />
-        </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100 dark:from-purple-950 dark:via-pink-950 dark:to-indigo-950 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 dark:bg-purple-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-300 dark:bg-pink-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-indigo-300 dark:bg-indigo-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
       </div>
-    </Layout>
+
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-4xl w-full">
+          {/* Hero Section */}
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-6">
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 rounded-2xl shadow-lg">
+                <Github className="w-12 h-12 text-white" />
+              </div>
+            </div>
+
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+              GitHub Portfolio Generator
+            </h1>
+
+            <p className="text-xl md:text-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent mb-8 max-w-2xl mx-auto leading-relaxed font-medium">
+              Discover amazing developer portfolios powered by AI insights.
+              Transform any GitHub profile into a stunning, interactive portfolio dashboard.
+            </p>
+
+            {/* Feature highlights */}
+            <div className="flex flex-wrap justify-center gap-6 mb-12">
+              <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-purple-200 dark:border-purple-700">
+                <Code className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <span className="text-sm font-semibold bg-gradient-to-r from-purple-700 to-purple-600 dark:from-purple-300 dark:to-purple-400 bg-clip-text text-transparent">Code Analytics</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-gradient-to-r from-pink-100 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/30 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-pink-200 dark:border-pink-700">
+                <Users className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                <span className="text-sm font-semibold bg-gradient-to-r from-pink-700 to-rose-600 dark:from-pink-300 dark:to-rose-400 bg-clip-text text-transparent">Social Insights</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-gradient-to-r from-indigo-100 to-blue-100 dark:from-indigo-900/30 dark:to-blue-900/30 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-indigo-200 dark:border-indigo-700">
+                <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-sm font-semibold bg-gradient-to-r from-indigo-700 to-blue-600 dark:from-indigo-300 dark:to-blue-400 bg-clip-text text-transparent">AI-Powered</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Username Input Form */}
+          <div className="max-w-md mx-auto">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="username" className="block text-lg font-bold bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-300 dark:to-pink-400 bg-clip-text text-transparent mb-3 text-center">
+                  Enter GitHub Username
+                </label>
+                <Input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setError('');
+                  }}
+                  placeholder="e.g., johnolamide"
+                  className="w-full text-center text-lg py-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-purple-200 dark:border-purple-700 focus:border-purple-500 dark:focus:border-purple-400 shadow-xl text-gray-900 dark:text-white placeholder:text-purple-400 dark:placeholder:text-purple-500"
+                  disabled={isLoading}
+                  required
+                />
+              </div>
+
+              {error && (
+                <div className="bg-gradient-to-r from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30 backdrop-blur-sm py-3 px-4 rounded-lg border border-red-200 dark:border-red-700">
+                  <p className="text-red-700 dark:text-red-300 text-center font-medium">{error}</p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Loading Portfolio...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center space-x-2">
+                    <Star className="w-5 h-5" />
+                    <span>Generate Portfolio</span>
+                  </div>
+                )}
+              </Button>
+            </form>
+
+            <div className="text-center mt-6">
+              <p className="text-base bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent font-medium">
+                Try with <span className="font-bold text-purple-700 dark:text-purple-300">"johnolamide"</span> or any GitHub username
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
-};
+}
+
+function App() {
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>('landing');
+  const [userData, setUserData] = useState<{ username: string } | null>(null);
+
+  const handleUsernameSubmit = async (username: string) => {
+    // Simulate API call - in real implementation, this would fetch GitHub data
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setUserData({ username });
+    setCurrentView('dashboard');
+  };
+
+  const handleBack = () => {
+    setUserData(null);
+    setCurrentView('landing');
+  };
+
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="portfolio-theme">
+      <ThemeToggle />
+      <ThemeDebug />
+      <TailwindTest />
+
+      {currentView === 'landing' ? (
+        <LandingPage onSubmit={handleUsernameSubmit} />
+      ) : (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Dashboard Coming Soon
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              Portfolio for {userData?.username} will be displayed here.
+            </p>
+            <Button onClick={handleBack} variant="outline">
+              ← Back to Home
+            </Button>
+          </div>
+        </div>
+      )}
+    </ThemeProvider>
+  );
+}
 
 export default App;

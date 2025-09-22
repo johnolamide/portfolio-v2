@@ -217,3 +217,57 @@ export interface ChatbotProps {
   userData: ProcessedUserData;
   username: string;
 }
+
+export interface GitHubRateLimit {
+  resources: {
+    core: {
+      limit: number;
+      remaining: number;
+      reset: number;
+      used: number;
+      resource: string;
+    };
+    search: {
+      limit: number;
+      remaining: number;
+      reset: number;
+      used: number;
+      resource: string;
+    };
+    graphql: {
+      limit: number;
+      remaining: number;
+      reset: number;
+      used: number;
+      resource: string;
+    };
+    integration_manifest: {
+      limit: number;
+      remaining: number;
+      reset: number;
+      used: number;
+      resource: string;
+    };
+    source_import: {
+      limit: number;
+      remaining: number;
+      reset: number;
+      used: number;
+      resource: string;
+    };
+    code_scanning_upload: {
+      limit: number;
+      remaining: number;
+      reset: number;
+      used: number;
+      resource: string;
+    };
+  };
+  rate: {
+    limit: number;
+    remaining: number;
+    reset: number;
+    used: number;
+    resource: string;
+  };
+}
