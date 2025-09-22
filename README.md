@@ -1,146 +1,177 @@
-# Portfolio API
+# GitHub Portfolio Generator v2
 
 <div align="center">
 
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white) ![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white) ![GitHub API](https://img.shields.io/badge/GitHub_API-100000?style=for-the-badge&logo=github&logoColor=white) ![Google Gemini](https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white) ![GitHub API](https://img.shields.io/badge/GitHub_API-100000?style=for-the-badge&logo=github&logoColor=white) ![Google Gemini](https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white) ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)
 
 </div>
 
-A functional API for fetching GitHub portfolio data and generating AI-powered chat responses. This library provides programmatic access to GitHub user profiles, repositories, and AI chatbot functionality without any UI components.
+🚀 **A dynamic, AI-powered web application that transforms GitHub profiles into professional portfolio dashboards instantly!**
 
-## Features
+Simply enter any GitHub username to generate a comprehensive, interactive portfolio showcasing their coding skills, projects, and professional presentation - all powered by real-time GitHub data and AI analysis.
 
-- **GitHub Data Fetching**: Retrieve user profiles, repositories, languages, and statistics
-- **AI Chatbot**: Generate context-aware responses using Google Gemini API
-- **Data Processing**: Transform raw GitHub data into structured portfolio information
-- **TypeScript Support**: Full type safety with comprehensive TypeScript definitions
-- **Rate Limiting**: Built-in handling for GitHub API rate limits
+## ✨ Features
 
-## Installation
+- **🔥 Instant Portfolio Generation**: Enter any GitHub username and get a professional portfolio dashboard in seconds
+- **📊 Interactive Analytics**: Comprehensive data visualization with charts, statistics, and project metrics using Recharts
+- **🤖 AI-Powered Chatbot**: Context-aware assistant powered by Google Gemini that analyzes portfolios and answers questions
+- **🎨 Modern UI/UX**: Beautiful, responsive design with dark/light themes and smooth animations
+- **📱 Mobile-First Design**: Fully responsive across all devices and screen sizes
+- **⚡ Real-Time Data**: Live GitHub API integration for up-to-date repository and profile information
+- **🔍 Advanced Filtering**: Sort and filter repositories by language, stars, forks, and update date
+- **📈 Visual Analytics**: Programming language distribution, activity timelines, and contribution patterns
+- **🎯 Professional Presentation**: Clean, portfolio-ready interface perfect for sharing with employers or clients
 
+## 🚀 Live Demo
+
+Default showcase: **johnolamide** - Try it with any GitHub username!
+
+[🌟 View Live Demo](https://your-demo-url.com) *(Coming Soon)*
+
+## 📸 Screenshots
+
+*Screenshots coming soon - showcasing the beautiful dashboard and AI chatbot in action!*
+
+## 🛠️ Installation & Setup
+
+### Prerequisites
+- [Bun](https://bun.sh/) (recommended) or Node.js 18+
+- GitHub Personal Access Token
+- Google Gemini API Key
+
+### Quick Start
+
+1. **Clone the repository**
 ```bash
-npm install portfolio-api
-# or
-bun add portfolio-api
+git clone https://github.com/johnolamide/portfolio-v2.git
+cd portfolio-v2
 ```
 
-## Environment Variables
+2. **Install dependencies**
+```bash
+bun install
+```
 
-Create a `.env` file with the following variables:
+3. **Set up environment variables**
+```bash
+cp env.example .env.local
+```
 
+Edit `.env.local` with your API keys:
 ```env
 VITE_GITHUB_TOKEN=your_github_personal_access_token
 VITE_GEMINI_API_KEY=your_google_gemini_api_key
 ```
 
-## Usage
-
-### Basic Usage
-
-```typescript
-import { PortfolioAPI } from 'portfolio-api';
-
-const api = new PortfolioAPI();
-
-// Fetch user data
-const userData = await api.getUserData('johnolamide');
-console.log(userData.user.login); // 'johnolamide'
-console.log(userData.stats.totalRepos); // Repository count
-
-// Generate AI response
-const response = await api.generateChatResponse(userData, 'Tell me about this developer');
-console.log(response);
+4. **Start the development server**
+```bash
+bun run dev
 ```
 
-### Advanced Usage
+5. **Open in browser**
+Navigate to `http://localhost:5173` and start exploring GitHub portfolios!
 
+## 🎯 How It Works
+
+1. **Enter Username**: Type any GitHub username in the landing page
+2. **Data Fetching**: Real-time retrieval of profile, repositories, and language statistics
+3. **Dashboard Generation**: Automatic creation of a comprehensive portfolio dashboard
+4. **AI Analysis**: Intelligent chatbot provides insights about the developer's skills and projects
+5. **Share & Explore**: Get shareable URLs for any generated portfolio
+
+## 🔧 Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_GITHUB_TOKEN` | GitHub Personal Access Token for API access | ✅ |
+| `VITE_GEMINI_API_KEY` | Google Gemini API key for AI features | ✅ |
+
+### Getting Your API Keys
+
+**GitHub Token:**
+1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
+2. Generate a new token with `public_repo` scope
+3. Copy the token to your `.env.local` file
+
+**Google Gemini API:**
+1. Visit [Google AI Studio](https://aistudio.google.com/)
+2. Create a new API key
+3. Copy the key to your `.env.local` file
+
+## 📚 Usage Examples
+
+### Basic Portfolio Generation
 ```typescript
-import { PortfolioAPI } from 'portfolio-api';
+import { PortfolioGenerator } from './src/utils/github';
 
-async function createPortfolio(username: string) {
-  const api = new PortfolioAPI();
-
-  try {
-    // Get comprehensive user data
-    const userData = await api.getUserData(username);
-
-    // Get specific repositories
-    const repos = await api.getUserRepos(username, {
-      limit: 10,
-      sort: 'stars'
-    });
-
-    // Generate personalized introduction
-    const intro = await api.generateChatResponse(
-      userData,
-      'Create a professional introduction for this developer'
-    );
-
-    return {
-      profile: userData.user,
-      stats: userData.stats,
-      topLanguages: userData.topLanguages,
-      repositories: repos,
-      introduction: intro
-    };
-
-  } catch (error) {
-    console.error('Error creating portfolio:', error.message);
-  }
-}
+// Generate portfolio for any GitHub user
+const portfolioData = await PortfolioGenerator.generate('johnolamide');
 ```
 
-## API Reference
-
-### PortfolioAPI Class
-
-#### `getUserData(username: string)`
-
-Fetches complete user data including profile, repositories, and language statistics.
-
-**Parameters:**
-- `username` (string): GitHub username
-
-**Returns:** `Promise<ProcessedUserData>`
-
-#### `getUserProfile(username: string)`
-
-Fetches basic user profile information.
-
-**Parameters:**
-- `username` (string): GitHub username
-
-**Returns:** `Promise<GitHubUser>`
-
-#### `getUserRepos(username: string, options?)`
-
-Fetches user repositories with optional filtering.
-
-**Parameters:**
-- `username` (string): GitHub username
-- `options` (object, optional):
-  - `limit` (number): Maximum number of repositories to return
-  - `sort` (string): Sort order ('stars', 'updated', etc.)
-
-**Returns:** `Promise<GitHubRepository[]>`
-
-#### `generateChatResponse(userData: ProcessedUserData, query: string)`
-
-Generates an AI response based on user data and query.
-
-**Parameters:**
-- `userData` (ProcessedUserData): User portfolio data
-- `query` (string): User question or prompt
-
-**Returns:** `Promise<string>`
-
-## Data Types
-
+### AI Chatbot Integration
 ```typescript
-interface ProcessedUserData {
-  user: GitHubUser;
-  repositories: GitHubRepository[];
-  topLanguages: LanguageStat[];
+import { portfolioAnalysisAgent } from './src/agent';
+
+// Get AI insights about a developer's portfolio
+const analysis = await portfolioAnalysisAgent({
+  githubData: portfolioData,
+  userQuery: "What are this developer's main strengths?"
+});
+```
+
+## 🏗️ Project Structure
+
+```
+src/
+├── components/          # React components
+│   ├── ui/             # Reusable UI components (shadcn/ui)
+│   ├── ChatBot.tsx     # AI chatbot interface
+│   └── Dashboard/      # Portfolio dashboard components
+├── hooks/              # Custom React hooks
+│   ├── useGitHubData.ts    # GitHub API data fetching
+│   └── useTheme.ts         # Theme management
+├── utils/              # Utility functions
+│   ├── github.ts       # GitHub API services
+│   ├── gemini.ts       # Google Gemini AI integration
+│   └── dataProcessing.ts   # Data transformation
+├── types/              # TypeScript type definitions
+└── pages/              # Application routes
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [GitHub API](https://docs.github.com/en/rest) for providing comprehensive developer data
+- [Google Gemini](https://deepmind.google/technologies/gemini/) for AI-powered portfolio analysis
+- [Recharts](https://recharts.org/) for beautiful data visualizations
+- [shadcn/ui](https://ui.shadcn.com/) for elegant UI components
+- [Tailwind CSS](https://tailwindcss.com/) for rapid styling
+- The open-source community for inspiration and support
+
+## 📧 Contact
+
+**John Olamide** - [@johnolamide](https://github.com/johnolamide)
+
+Project Link: [https://github.com/johnolamide/portfolio-v2](https://github.com/johnolamide/portfolio-v2)
+
+---
+
+⭐ **Star this repo if you found it helpful!** ⭐
   stats: UserStats;
 }
 
