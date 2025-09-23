@@ -6,6 +6,7 @@ import { Dashboard } from './components/Dashboard';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { useGitHubUserData } from './hooks/useGitHubData';
+import { usernameTrackingService } from './utils/supabase';
 import { Github, Sparkles, Code, Users, Star } from 'lucide-react';
 import './App.css';
 
@@ -22,6 +23,21 @@ function LandingPage({ onSubmit }: { onSubmit: (username: string) => void }) {
   const [username, setUsername] = useState('johnolamide');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [usageStats, setUsageStats] = useState<{ usage_count: number } | null>(null);
+
+  // Fetch usage stats when username changes
+  useEffect(() => {
+    const fetchUsageStats = async () => {
+      if (username.trim()) {
+        const stats = await usernameTrackingService.getUsageStats(username.trim());
+        setUsageStats(stats);
+      }
+    };
+
+    // Debounce the API call
+    const timeoutId = setTimeout(fetchUsageStats, 300);
+    return () => clearTimeout(timeoutId);
+  }, [username]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +50,10 @@ function LandingPage({ onSubmit }: { onSubmit: (username: string) => void }) {
     setError('');
 
     try {
+      // Record username usage in Supabase
+      await usernameTrackingService.recordUsage(username.trim());
+
+      // Proceed with portfolio generation
       await onSubmit(username.trim());
     } catch {
       setError('Failed to load portfolio. Please try again.');
@@ -107,6 +127,15 @@ function LandingPage({ onSubmit }: { onSubmit: (username: string) => void }) {
                   disabled={isLoading}
                   required
                 />
+                
+                {/* Usage stats display */}
+                {usageStats && (
+                  <div className="mt-2 text-center">
+                    <p className="text-sm text-purple-600 dark:text-purple-400">
+                      This username has been used {usageStats.usage_count} time{usageStats.usage_count !== 1 ? 's' : ''} to generate portfolios
+                    </p>
+                  </div>
+                )}
               </div>
 
               {error && (

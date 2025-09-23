@@ -63,7 +63,21 @@ Edit `.env.local` with your API keys:
 ```env
 VITE_GITHUB_TOKEN=your_github_personal_access_token
 VITE_GEMINI_API_KEY=your_google_gemini_api_key
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
+
+### Setting up Supabase (Optional - for Username Tracking)
+
+The app includes optional username tracking functionality that records how many times each GitHub username has been used to generate portfolios.
+
+1. **Create a Supabase project** at [supabase.com](https://supabase.com)
+2. **Go to your project's SQL Editor**
+3. **Run the setup script** from `supabase-setup.sql` in your project root
+4. **Get your project credentials** from Settings > API
+5. **Add them to your `.env.local`** file as shown above
+
+If Supabase is not configured, the app will work normally but won't track username usage statistics.
 
 4. **Start the development server**
 ```bash
