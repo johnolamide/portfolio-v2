@@ -131,9 +131,9 @@ function LandingPage({ onSubmit }: { onSubmit: (username: string) => void }) {
                 {/* Usage stats display */}
                 {usageStats && (
                   <div className="mt-2 text-center">
-                    <p className="text-sm text-purple-600 dark:text-purple-400">
+                    {/* <p className="text-sm text-purple-600 dark:text-purple-400">
                       This username has been used {usageStats.usage_count} time{usageStats.usage_count !== 1 ? 's' : ''} to generate portfolios
-                    </p>
+                    </p> */}
                   </div>
                 )}
               </div>
